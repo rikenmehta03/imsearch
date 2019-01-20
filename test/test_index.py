@@ -2,13 +2,14 @@ import cv2
 import glob 
 import os, sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import imsearch
 
-all_images = glob.glob('../images/*.jpg')
+all_images = glob.glob(os.path.join(os.path.dirname(__file__), '..', 'images/*.jpg'))
 
 index = imsearch.init('test')
+# index.cleanIndex()
 # index.addImageBatch(all_images[0:25])
 index.createIndex()
 similar = index.knnQuery(all_images[25])

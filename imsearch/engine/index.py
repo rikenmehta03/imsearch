@@ -46,6 +46,11 @@ class Index:
             new_matches.append((_match, score))
         new_matches.sort(key=lambda x: x[1])
         return new_matches
+    
+    def cleanIndex(self):
+        self._feature_extractor.clean()
+        self._nmslib_index.clean()
+        self._repository_db.clean()
 
     def addImage(self, image_path):
         features = self._feature_extractor.extract(image_path)
@@ -61,7 +66,11 @@ class Index:
 
     def knnQuery(self, image_path, k=10):
         features = self._feature_extractor.extract(image_path, save=False)
-        knn = self._nmslib_index.knnQuery(features['object_bitmap'], 'bitmap', k=10)
-        matches = [(self._repository_db.find(
-            {'bitmap_id': x[0]}, many=False), x[1]) for x in knn]
-        return self._sort_matches(features, matches)
+        # knn = self._nmslib_index.knnQuery(features['object_bitmap'], 'bitmap', k=10)
+        # matches = [(self._repository_db.find(
+        #     {'bitmap_id': x[0]}, many=False), x[1]) for x in knn]
+        # return self._sort_matches(features, matches)
+
+        knn = self._nmslib_index.knnQuery(features['secondary'], 'secondary', k=10)
+        matches = [(self._repository_db.find({'secondary_id': x[0]}, many=False), x[1]) for x in knn]
+        return matches

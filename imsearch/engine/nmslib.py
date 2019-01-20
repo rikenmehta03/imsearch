@@ -1,4 +1,5 @@
 import os
+import shutil
 import pandas as pd
 import numpy as np
 import nmslib
@@ -16,12 +17,6 @@ def NMSLIBIndex(index_name):
 class _nmslibIndex:
     def __init__(self, name):
         self.index_name = name
-        self.primary = nmslib.init(
-            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
-        self.secondary = nmslib.init(
-            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
-        self.bitmap = nmslib.init(
-            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
         self._load_index()
 
     def _add_data(self, index, df):
@@ -35,6 +30,12 @@ class _nmslibIndex:
 
     def _load_index(self):
         index_file = self._get_index_path()
+        self.primary = nmslib.init(
+            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
+        self.secondary = nmslib.init(
+            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
+        self.bitmap = nmslib.init(
+            method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
         if os.path.exists(index_file):
             self.primary_df = pd.read_hdf(index_file, 'primary')
             self.primary, self.primary_c = self._add_data(
@@ -54,6 +55,12 @@ class _nmslibIndex:
     def _add_data_point(self, index, count, data):
         _t = index.addDataPoint(count, data)
         return index, _t + 1
+
+    def clean(self):
+        index_file = self._get_index_path()
+        if os.path.exists(os.path.dirname(index_file)):
+            shutil.rmtree(os.path.dirname(index_file))
+            self._load_index()
 
     def getDataByIds(self, id_list, _type='primary'):
         return [self.getDataById(x, _type) for x in id_list]
@@ -116,7 +123,7 @@ class _nmslibIndex:
 
         if not os.path.exists(self._get_index_path()):
             os.makedirs(os.path.dirname(self._get_index_path()))
-
+            
         self.primary_df.to_hdf(self._get_index_path(), 'primary')
         self.secondary_df.to_hdf(self._get_index_path(), 'secondary')
         self.bitmap_df.to_hdf(self._get_index_path(), 'bitmap')

@@ -7,7 +7,7 @@ import redis
 import tensorflow as tf
 
 import keras
-from keras.applications.inception_v3 import preprocess_input
+from keras.applications.inception_resnet_v2 import preprocess_input
 
 from object_detector import get_model, preprocess_image, resize_image, labels_to_names_dict
 
@@ -23,7 +23,7 @@ keras.backend.tensorflow_backend.set_session(get_session())
 REDIS_DB = redis.StrictRedis(host='localhost', port='6379', db='0')
 REDIS_QUEUE = 'image_queue'
 BATCH_SIZE = 32
-inception_model = keras.applications.inception_v3.InceptionV3(
+inception_model = keras.applications.inception_resnet_v2.InceptionResNetV2(
     include_top=False, weights='imagenet', pooling='avg')
 
 

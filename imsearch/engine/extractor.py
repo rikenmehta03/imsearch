@@ -18,7 +18,7 @@ class FeatureExtractor:
 
         if not os.path.exists(self._get_image_path()):
             os.makedirs(self._get_image_path())
-
+             
     def _load_image(self, image_path):
         image = Image.open(image_path).convert('RGB')
         image = np.asarray(image).astype(np.float32)[:, :, ::-1]
@@ -54,6 +54,10 @@ class FeatureExtractor:
 
         data['secondary'] = self._base64_decode(data['secondary'])
         return data
+
+    def clean(self):
+        shutil.rmtree(self._get_image_path())
+        os.makedirs(self._get_image_path())
 
     def extract(self, image_path, save=True):
         image = self._load_image(image_path)

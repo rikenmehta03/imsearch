@@ -6,6 +6,9 @@ class MongoRepository:
         self.db = MongoClient(
             'mongodb://localhost:27017/').imsearch[index_name]
 
+    def clean(self):
+        self.db.drop()        
+
     def insert_one(self, data):
         return self.db.insert_one(data)
 

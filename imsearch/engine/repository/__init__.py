@@ -9,6 +9,9 @@ def get_repository(index_name, repo_type):
 class RepositoryWrapper:
     def __init__(self, repo):
         self.db = repo
+    
+    def clean(self):
+        self.db.clean()
 
     def insert(self, data):
         if isinstance(data, dict):
