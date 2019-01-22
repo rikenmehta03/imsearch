@@ -18,7 +18,7 @@ class FeatureExtractor:
 
         if not os.path.exists(self._get_image_path()):
             os.makedirs(self._get_image_path())
-             
+
     def _load_image(self, image_path):
         image = Image.open(image_path).convert('RGB')
         image = np.asarray(image).astype(np.float32)[:, :, ::-1]
@@ -49,9 +49,12 @@ class FeatureExtractor:
 
     def _decode_redis_data(self, data):
         data = json.loads(data.decode('utf-8'))
-        for k, v in data['primary'].items():
-            data['primary'][k] = (self._base64_decode(v[0]), v[1])
 
+        def _decode(d):
+            d['features'] = self._base64_decode(d['features'])
+            return d
+
+        data['primary'] = map(_decode, data['primary'])
         data['secondary'] = self._base64_decode(data['secondary'])
         return data
 

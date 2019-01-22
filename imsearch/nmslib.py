@@ -30,19 +30,23 @@ class _nmslibIndex:
 
     def _load_index(self):
         index_file = self._get_index_path()
+
         self.primary = nmslib.init(
             method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
         self.secondary = nmslib.init(
             method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
         self.bitmap = nmslib.init(
             method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
+
         if os.path.exists(index_file):
             self.primary_df = pd.read_hdf(index_file, 'primary')
             self.primary, self.primary_c = self._add_data(
                 self.primary, self.primary_df)
+
             self.secondary_df = pd.read_hdf(index_file, 'secondary')
             self.secondary, self.secondary_c = self._add_data(
                 self.secondary, self.secondary_df)
+
             self.bitmap_df = pd.read_hdf(index_file, 'bitmap')
             self.bitmap, self.bitmap_c = self._add_data(
                 self.bitmap, self.bitmap_df)
@@ -50,6 +54,7 @@ class _nmslibIndex:
             self.primary_df = None
             self.secondary_df = None
             self.bitmap_df = None
+
             self.primary_c, self.secondary_c, self.bitmap_c = 0, 0, 0
 
     def _add_data_point(self, index, count, data):
@@ -69,27 +74,26 @@ class _nmslibIndex:
         return getattr(self, _type + '_df').iloc[_id].values
 
     def addDataPoint(self, data):
-        primary_ids = []
-        primary_labels = []
-        primary_label_names = []
-        for k, v in data['primary'].items():
-            primary_ids.append(self.primary_c)
-            primary_labels.append(int(k))
-            primary_label_names.append(v[1])
+        primary = []
+        for d in data['primary']:
+            primary.append({
+                'index': self.primary_c,
+                'label': d['label'],
+                'name': d['name']
+            })
+            v = d['features']
             if self.primary_df is None:
-                self.primary_df = pd.DataFrame(columns=range(v[0].shape[0]))
-            self.primary_df.loc[self.primary_c] = v[0]
+                self.primary_df = pd.DataFrame(columns=range(v.shape[0]))
+            self.primary_df.loc[self.primary_c] = v
             self.primary, self.primary_c = self._add_data_point(
-                self.primary, self.primary_c, v[0])
+                self.primary, self.primary_c, v)
 
         db_data = {
             '_id': data['id'],
             'image': data['image'],
-            'primary_id': primary_ids,
-            'primary_label': primary_labels,
-            'primary_label_names': primary_label_names,
-            'secondary_id': self.secondary_c,
-            'bitmap_id': self.bitmap_c
+            'primary': primary,
+            'secondary_index': self.secondary_c,
+            'bitmap_index': self.bitmap_c
         }
 
         v = data['secondary']
@@ -123,7 +127,7 @@ class _nmslibIndex:
 
         if not os.path.exists(self._get_index_path()):
             os.makedirs(os.path.dirname(self._get_index_path()))
-            
+
         self.primary_df.to_hdf(self._get_index_path(), 'primary')
         self.secondary_df.to_hdf(self._get_index_path(), 'secondary')
         self.bitmap_df.to_hdf(self._get_index_path(), 'bitmap')

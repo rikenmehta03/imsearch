@@ -37,5 +37,8 @@ index.addImageBatch(all_images[1:])
 index.createIndex() 
 
 # find k nearest similar images
-similar = index.knnQuery('path/to/query/image', k=10)
+# choose policy from 'object' or 'global'. Search results will change accordingly.
+# object: Object level matching. The engine will look for similarity at object level for every object detected in the image.
+# global: Overall similarity using single feature space on the whole image. 
+similar = index.knnQuery('path/to/query/image', k=10, policy='object')
 ```

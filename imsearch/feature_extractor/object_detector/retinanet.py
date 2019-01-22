@@ -11,11 +11,13 @@ def _get_weights_path():
     home_dir = os.environ.get('HOME')
     return os.path.join(home_dir, '.imsearch', 'resnet50_coco_best_v2.1.0.h5')
 
-def labels_to_name(label):
+
+def label_to_name(label):
     return labels_to_names_dict[label]
 
 
 def get_model():
     if not os.path.exists(_get_weights_path()):
-        wget.download('https://github.com/fizyr/keras-retinanet/releases/download/0.5.0/resnet50_coco_best_v2.1.0.h5', out=_get_weights_path())
+        wget.download(
+            'https://github.com/fizyr/keras-retinanet/releases/download/0.5.0/resnet50_coco_best_v2.1.0.h5', out=_get_weights_path())
     return models.load_model(_get_weights_path(), backbone_name='resnet50')

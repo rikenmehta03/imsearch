@@ -1,3 +1,5 @@
-from .engine import init
+from .index import Index
 
-__version__='0.1.0'
+
+def init(name='index'):
+    return Index(name=name)

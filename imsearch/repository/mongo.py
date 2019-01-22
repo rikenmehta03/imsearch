@@ -7,7 +7,7 @@ class MongoRepository:
             'mongodb://localhost:27017/').imsearch[index_name]
 
     def clean(self):
-        self.db.drop()        
+        self.db.drop()
 
     def insert_one(self, data):
         return self.db.insert_one(data)
