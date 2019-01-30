@@ -1,10 +1,11 @@
+import os
 from pymongo import MongoClient
 
 
 class MongoRepository:
     def __init__(self, index_name):
-        self.db = MongoClient(
-            'mongodb://localhost:27017/').imsearch[index_name]
+        url = os.environ.get('MONGO_URI')
+        self.db = MongoClient(url).imsearch[index_name]
 
     def clean(self):
         self.db.drop()

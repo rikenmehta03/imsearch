@@ -21,7 +21,7 @@ def get_session():
 
 keras.backend.tensorflow_backend.set_session(get_session())
 
-REDIS_DB = redis.StrictRedis(host='localhost', port='6379', db='0')
+REDIS_DB = redis.StrictRedis.from_url(os.environ.get('REDIS_URI', 'redis://localhost:6379/0'))
 REDIS_QUEUE = 'image_queue'
 BATCH_SIZE = 32
 
@@ -35,11 +35,11 @@ def get_inception_features(x):
     return base64.b64encode(x[0]).decode("utf-8")
 
 
-def decode_image(_q):
+def decode_image(_q, dtype=np.uint8):
     if sys.version_info.major == 3:
         img = bytes(_q['image'], encoding="utf-8")
 
-    img = np.frombuffer(base64.decodestring(img), dtype=np.float32)
+    img = np.frombuffer(base64.decodestring(img), dtype=dtype)
     img = img.reshape(_q['shape'])
     return img
 

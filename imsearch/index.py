@@ -4,8 +4,10 @@ index.py
 The module contains the Index class 
 """
 
+import os
 import numpy as np
 import copy
+import requests
 
 from .nmslib import NMSLIBIndex
 from .extractor import FeatureExtractor
@@ -30,8 +32,9 @@ class Index:
             Unique indentifier for your searchable index object. 
         """
         Index.object_counter += 1
-        if Index.fe is None or Index.fe.poll() is not None:
+        if os.environ.get('DETECTOR_MODE') == 'local' and (Index.fe is None or Index.fe.poll() is not None):
             Index.fe = run()
+        self.match_ratio = 0.3
         self.name = name
         self._nmslib_index = NMSLIBIndex(self.name)
         self._feature_extractor = FeatureExtractor(self.name)
@@ -59,10 +62,12 @@ class Index:
                     _id = img_data['_id']
 
                     if _id in matches:
-                        matches[_id] = (copy.deepcopy(img_data),
-                                        0.5/x[1] + matches[_id][1])
+                        matches[_id]['s_dist'] = x[1] + matches[_id]['s_dist']
                     else:
-                        matches[_id] = (copy.deepcopy(img_data), 0.5/x[1])
+                        matches[_id] = {
+                            'data': copy.deepcopy(img_data),
+                            's_dist': x[1]
+                        }
 
         knn = self._nmslib_index.knnQuery(
             features['secondary'], 'secondary', k=10)
@@ -71,22 +76,23 @@ class Index:
             if img_data is not None:
                 _id = img_data['_id']
                 if _id in matches:
-                    matches[_id] = (copy.deepcopy(img_data),
-                                    0.5/x[1] + matches[_id][1])
+                    matches[_id]['p_dist'] = x[1]
                 else:
-                    matches[_id] = (copy.deepcopy(img_data), 0.5/x[1])
+                    matches[_id] = {
+                        'data': copy.deepcopy(img_data),
+                        'p_dist': x[1]
+                    }
 
         matches = list(matches.values())
+        total_objects = float(len(features['primary']))
 
         def update_scores(data):
-            score = 0.5*np.linalg.norm(features['secondary'] - self._nmslib_index.getDataById(
-                data[0]['secondary_index'], 'secondary'))
-            data = (data[0], score + data[1])
-            return data
+            score = (1 - self.match_ratio)*data.get('p_dist', 0) / \
+                total_objects + self.match_ratio*data.get('s_dist', 0)
+            return (data['data'], score)
 
         matches = list(map(update_scores, matches))
-        matches.sort(reverse=True, key=lambda x: x[1])
-
+        matches.sort(key=lambda x: x[1])
         return matches
 
     def cleanIndex(self):
@@ -103,7 +109,7 @@ class Index:
         Parameters
         ---------
         image_path
-            The path to the image to add to the index.
+            The local path or url to the image to add to the index.
         """
         features = self._feature_extractor.extract(image_path)
         reposiory_data = self._nmslib_index.addDataPoint(features)
@@ -115,7 +121,7 @@ class Index:
         Parameters
         ---------
         image_list
-            The list of the image paths to add to the index.
+            The list of the image paths or urls to add to the index.
         """
         for image_path in image_list:
             self.addImage(image_path)
