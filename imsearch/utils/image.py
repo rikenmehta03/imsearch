@@ -2,12 +2,15 @@ import sys
 import base64
 import requests
 import cv2
-from skimage import io
+from skimage import io, color
 
 import numpy as np
 
 def load_image(image_path):
-    return io.imread(image_path)[:, :, ::-1]
+    img = io.imread(image_path)
+    if img.shape[2] > 3:
+        img = img[:, :, :3]
+    return img[:, :, ::-1]
 
 def save_image(image, dest):
     cv2.imwrite(dest, image)

@@ -11,6 +11,7 @@ import keras
 from keras.applications.inception_resnet_v2 import preprocess_input
 
 from object_detector import get_model, preprocess_image, resize_image, label_to_name, labels_to_names_dict
+from imsearch import utils
 
 
 def get_session():
@@ -28,21 +29,10 @@ BATCH_SIZE = 32
 inception_model = keras.applications.inception_resnet_v2.InceptionResNetV2(
     include_top=False, weights='imagenet', pooling='avg')
 
-
 def get_inception_features(x):
     x = preprocess_input(x)
     x = inception_model.predict(np.expand_dims(x, axis=0))
     return base64.b64encode(x[0]).decode("utf-8")
-
-
-def decode_image(_q, dtype=np.uint8):
-    if sys.version_info.major == 3:
-        img = bytes(_q['image'], encoding="utf-8")
-
-    img = np.frombuffer(base64.decodestring(img), dtype=dtype)
-    img = img.reshape(_q['shape'])
-    return img
-
 
 def main():
     primary_model = get_model()
@@ -55,7 +45,7 @@ def main():
                 'object_bitmap': [0 for _ in range(len(labels_to_names_dict))]
             }
             _q = json.loads(_q.decode("utf-8"))
-            img = decode_image(_q)
+            img = utils.base64_decode(_q['image'], _q['shape'])
 
             all_features['secondary'] = get_inception_features(img.copy())
 
