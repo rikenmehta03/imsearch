@@ -13,7 +13,7 @@ setuptools.setup(
     author='Riken Mehta',
     author_email='riken.mehta03@gmail.com',
     packages=setuptools.find_packages(),
-    install_requires=['keras-retinanet', 'pandas', 'redis', 'pymongo', 'nmslib', 'wget'],
+    install_requires=['torch', 'torchvision', 'pandas', 'tables', 'redis', 'pymongo', 'nmslib', 'wget', 'scikit-image', 'opencv-python', 'requests'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache License 2.0",

@@ -13,7 +13,7 @@ from .nmslib import NMSLIBIndex
 from .extractor import FeatureExtractor
 from .repository import get_repository
 
-from .feature_extractor import run
+from .backend import run
 
 
 class Index:

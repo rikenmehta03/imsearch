@@ -1,6 +1,6 @@
 from .config import config_init
 from .index import Index
-from .feature_extractor import run
+from .backend import run
 
 
 def init(name='index',**config):

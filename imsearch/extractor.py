@@ -34,11 +34,13 @@ class FeatureExtractor:
         data = json.loads(data.decode('utf-8'))
 
         def _decode(d):
-            d['features'] = utils.base64_decode(d['features'], dtype=np.float32)
+            d['features'] = utils.base64_decode(
+                d['features'], dtype=np.float32)
             return d
 
         data['primary'] = list(map(_decode, data['primary']))
-        data['secondary'] = utils.base64_decode(data['secondary'], dtype=np.float32)
+        data['secondary'] = utils.base64_decode(
+            data['secondary'], dtype=np.float32)
         return data
 
     def clean(self):

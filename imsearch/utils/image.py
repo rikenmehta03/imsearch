@@ -6,18 +6,22 @@ from skimage import io, color
 
 import numpy as np
 
+
 def load_image(image_path):
     img = io.imread(image_path)
     if img.shape[2] > 3:
         img = img[:, :, :3]
     return img[:, :, ::-1]
 
+
 def save_image(image, dest):
     cv2.imwrite(dest, image)
+
 
 def base64_encode(a):
     a = a.copy(order='C')
     return base64.b64encode(a).decode("utf-8")
+
 
 def base64_decode(a, shape=None, dtype=np.uint8):
     if sys.version_info.major == 3:

@@ -6,6 +6,7 @@ default_config = {
     'REDIS_URI': 'redis://localhost:6379/0'
 }
 
+
 def config_init(config):
     final_config = copy.deepcopy(default_config)
     for k, v in config.items():
@@ -14,5 +15,5 @@ def config_init(config):
         final_config['DETECTOR_MODE'] = 'local'
     else:
         final_config['DETECTOR_MODE'] = 'remote'
-        
+
     os.environ.update(final_config)

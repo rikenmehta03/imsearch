@@ -8,10 +8,9 @@ instance_map = {}
 
 
 def NMSLIBIndex(index_name):
-    if instance_map.get(index_name, None) is None:
-        return _nmslibIndex(index_name)
-    else:
-        return instance_map.get(index_name)
+    if index_name not in instance_map:
+        instance_map[index_name] = _nmslibIndex(index_name)
+    return instance_map[index_name]
 
 
 class _nmslibIndex:
@@ -79,7 +78,8 @@ class _nmslibIndex:
             primary.append({
                 'index': self.primary_c,
                 'label': d['label'],
-                'name': d['name']
+                'name': d['name'],
+                'box': d['box']
             })
             v = d['features']
             if self.primary_df is None:
