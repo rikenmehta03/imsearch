@@ -91,6 +91,7 @@ class _nmslibIndex:
         db_data = {
             '_id': data['id'],
             'image': data['image'],
+            'url': data.get('url', ''),
             'primary': primary,
             'secondary_index': self.secondary_c,
             'bitmap_index': self.bitmap_c

@@ -11,7 +11,20 @@ def load_image(image_path):
     img = io.imread(image_path)
     if img.shape[2] > 3:
         img = img[:, :, :3]
-    return img[:, :, ::-1]
+    return img
+
+def check_load_image(image_path):
+    if requests.get(image_path).status_code != 200:
+        return None
+
+    img = io.imread(image_path)
+    if len(img.shape) != 3:
+        return None
+    
+    if img.shape[2] > 3:
+        img = img[:, :, :3]
+    
+    return img        
 
 
 def save_image(image, dest):

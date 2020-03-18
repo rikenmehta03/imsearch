@@ -112,8 +112,11 @@ class Index:
             The local path or url to the image to add to the index.
         """
         features = self._feature_extractor.extract(image_path)
+        if features is None:
+            return False
         reposiory_data = self._nmslib_index.addDataPoint(features)
         self._repository_db.insert(reposiory_data)
+        return True
 
     def addImageBatch(self, image_list):
         """
@@ -123,9 +126,11 @@ class Index:
         image_list
             The list of the image paths or urls to add to the index.
         """
+        response = []
         for image_path in image_list:
-            self.addImage(image_path)
-
+            response.append(self.addImage(image_path))
+        return response
+        
     def createIndex(self):
         """
         Creates the index. Set create time paramenters and query-time parameters for nmslib index. 

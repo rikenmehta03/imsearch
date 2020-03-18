@@ -34,13 +34,17 @@ class Detector(object):
         self.classes = load_classes(self.class_path)
 
     def _load_image(self, img):
+        actual_size = img.shape
+        img = self._process_image(img)
+        img = img.unsqueeze_(0)
+        return img, actual_size
+    
+    def _process_image(self, img):
         img = Image.fromarray(img)
-        actual_size = img.size
         img = transforms.ToTensor()(img)
         img, _ = pad_to_square(img, 0)
         img = resize(img, self.img_size)
-        img = img.unsqueeze_(0)
-        return img, actual_size
+        return img
 
     def predict(self, img):
         input_img, actual_shape = self._load_image(img)
@@ -56,10 +60,10 @@ class Detector(object):
             detections = rescale_boxes(
                 detections, self.img_size, actual_shape[:2])
             for x1, y1, x2, y2, _, cls_conf, cls_pred in detections:
-                x1 = max(min(int(x1.item()), actual_shape[0]), 0)
-                x2 = max(min(int(x2.item()), actual_shape[0]), 0)
-                y1 = max(min(int(y1.item()), actual_shape[1]), 0)
-                y2 = max(min(int(y2.item()), actual_shape[1]), 0)
+                x1 = max(min(int(x1.item()), actual_shape[1]-1), 0)
+                x2 = max(min(int(x2.item()), actual_shape[1]-1), 0)
+                y1 = max(min(int(y1.item()), actual_shape[0]-1), 0)
+                y2 = max(min(int(y2.item()), actual_shape[0]-1), 0)
                 response.append({
                     'box': [x1, y1, x2, y2],
                     'score': cls_conf.item(),

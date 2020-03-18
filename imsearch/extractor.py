@@ -48,7 +48,9 @@ class FeatureExtractor:
         os.makedirs(self._get_image_path())
 
     def extract(self, image_path, save=True):
-        image = utils.load_image(image_path)
+        image = utils.check_load_image(image_path)
+        if image is None:
+            return None
         _id = str(uuid.uuid4())
         data = {
             'id': _id,
@@ -66,5 +68,9 @@ class FeatureExtractor:
         result['id'] = _id
         if save:
             result['image'] = self._save_image(image, _id)
+
+        if 'http' in image_path:
+            result['url'] = image_path
+
         self._redis_db.delete(_id)
         return result

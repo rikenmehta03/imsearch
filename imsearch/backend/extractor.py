@@ -36,7 +36,7 @@ def main():
                 box = obj['box']
                 x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
                 if(x2-x1 >= 75 and y2-y1 >= 75):
-                    features = extract_features(img[x1:x2, y1:y2])
+                    features = extract_features(img[y1:y2, x1:x2])
                     all_features['primary'].append({
                         'features': features,
                         'label': obj['label'],
