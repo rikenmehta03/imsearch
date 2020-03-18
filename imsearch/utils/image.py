@@ -14,7 +14,7 @@ def load_image(image_path):
     return img
 
 def check_load_image(image_path):
-    if requests.get(image_path).status_code != 200:
+    if 'http' in image_path and requests.get(image_path).status_code != 200:
         return None
 
     img = io.imread(image_path)
