@@ -41,6 +41,7 @@ class Index:
         self._repository_db = get_repository(self.name, 'mongo')
 
     def __del__(self):
+        self._nmslib_index.createIndex()
         Index.object_counter -= 1
         if Index.object_counter == 0 and Index.fe is not None:
             Index.fe.terminate()

@@ -23,6 +23,9 @@ def create_index(name, images):
     # Add images in batch (List of image paths locally stored)
     index.addImageBatch(images[1:])
 
+    # Build the index
+    index.createIndex()
+
     return index
 
 
