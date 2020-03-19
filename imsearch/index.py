@@ -130,7 +130,7 @@ class Index:
         for image_path in image_list:
             response.append(self.addImage(image_path))
         return response
-        
+
     def createIndex(self):
         """
         Creates the index. Set create time paramenters and query-time parameters for nmslib index. 
@@ -146,6 +146,10 @@ class Index:
             The path to the query image.
         k=10
             Number of results.
+        policy='global'
+            choose policy from 'object' or 'global'. Search results will change accordingly.
+            object: Object level matching. The engine will look for similarity at object level for every object detected in the image.
+            global: Overall similarity using single feature space on the whole image.
         """
 
         features = self._feature_extractor.extract(image_path, save=False)

@@ -42,7 +42,7 @@ index.createIndex()
 # global: Overall similarity using single feature space on the whole image. 
 similar = index.knnQuery('path/to/query/image', k=10, policy='object')
 ```
-
+For detailed usage see [`examples/index.py`](examples/index.py)
 ## Credit
 
 ### YOLOv3: An Incremental Improvement
