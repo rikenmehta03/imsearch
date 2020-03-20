@@ -126,12 +126,16 @@ class _nmslibIndex:
         self.secondary.createIndex(index_time_params)
         self.bitmap.createIndex(index_time_params)
 
-        if not os.path.exists(self._get_index_path()):
-            os.makedirs(os.path.dirname(self._get_index_path()))
-
-        self.primary_df.to_hdf(self._get_index_path(), 'primary')
-        self.secondary_df.to_hdf(self._get_index_path(), 'secondary')
-        self.bitmap_df.to_hdf(self._get_index_path(), 'bitmap')
+        os.makedirs(os.path.dirname(self._get_index_path()), exist_ok=True)
+        
+        if self.primary_df is not None:
+            self.primary_df.to_hdf(self._get_index_path(), 'primary')
+        
+        if self.secondary_df is not None:
+            self.secondary_df.to_hdf(self._get_index_path(), 'secondary')
+        
+        if self.bitmap_df is not None:
+            self.bitmap_df.to_hdf(self._get_index_path(), 'bitmap')
 
         efs = 100
         query_time_params = {'efSearch': efs}
