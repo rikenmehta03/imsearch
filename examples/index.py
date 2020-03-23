@@ -46,9 +46,9 @@ def create_index_with_config(name):
                           DETECTOR_MODE='local')
 
 
-
 def show_results(similar, qImage):
-    qImage = imsearch.utils.load_image(qImage)
+    qImage = imsearch.utils.check_load_image(qImage)
+    qImage = cv2.cvtColor(qImage, cv2.COLOR_RGB2BGR)
     cv2.imshow('qImage', qImage)
     for _i, _s in similar:
         rImage = cv2.imread(_i['image'])

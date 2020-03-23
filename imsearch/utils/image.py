@@ -2,33 +2,33 @@ import sys
 import base64
 import requests
 import cv2
-from skimage import io, color
+from PIL import Image
+from io import BytesIO
 
 import numpy as np
 
 
-def load_image(image_path):
-    img = io.imread(image_path)
-    if img.shape[2] > 3:
-        img = img[:, :, :3]
-    return img
-
 def check_load_image(image_path):
-    if 'http' in image_path and requests.get(image_path).status_code != 200:
-        return None
+    if 'http' in image_path:
+        r = requests.get(image_path)
+        if r.status_code != 200:
+            return None
+        img = np.asarray(Image.open(BytesIO(r.content)))
+    else:
+        img = np.asarray(Image.open(image_path))
 
-    img = io.imread(image_path)
     if len(img.shape) != 3:
         return None
-    
+
     if img.shape[2] > 3:
         img = img[:, :, :3]
-    
-    return img        
+
+    return img
 
 
 def save_image(image, dest):
-    cv2.imwrite(dest, image)
+    image = Image.fromarray(image)
+    image.save(dest)
 
 
 def base64_encode(a):

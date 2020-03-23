@@ -39,6 +39,6 @@ if __name__ == "__main__":
     PATH = '../images/000000000139.jpg'
     detector = Detector()
 
-    img = utils.load_image(PATH)
+    img = utils.check_load_image(PATH)
     output = detector.predict(img)
     show_output(output, img)
