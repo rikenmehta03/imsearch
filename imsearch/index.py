@@ -39,10 +39,10 @@ class Index:
         self._nmslib_index = NMSLIBIndex(self.name)
         self._feature_extractor = FeatureExtractor(self.name)
         self._repository_db = get_repository(self.name, 'mongo')
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, type, value, traceback):
         self._nmslib_index.createIndex()
 
@@ -94,7 +94,7 @@ class Index:
 
         def update_scores(data):
             score = (1 - self.match_ratio)*data.get('p_dist', 0) / \
-                total_objects + self.match_ratio*data.get('s_dist', 0)
+                (total_objects + 10e-5) + self.match_ratio*data.get('s_dist', 0)
             return (data['data'], score)
 
         matches = list(map(update_scores, matches))
