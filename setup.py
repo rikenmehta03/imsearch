@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='imsearch',
-    version='0.1.0',
+    version='0.1.1',
     description='A generic framework to build your own reverse image search engine',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -16,7 +16,7 @@ setuptools.setup(
     install_requires=['torch', 'torchvision', 'pandas', 'tables', 'redis', 'pymongo', 'nmslib', 'wget', 'opencv-python', 'requests'],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache License 2.0",
-        "Operating System :: Linux",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: POSIX :: Linux",
     ]
 )
