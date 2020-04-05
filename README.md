@@ -1,5 +1,7 @@
 # imSearch: A generic framework to build your own reverse image search engine
 
+![CI](https://github.com/rikenmehta03/imsearch/workflows/CI/badge.svg?branch=master)
+
 imsearch helps to create your own custom, robust & scalable reverse image search engine. This project uses state of the art object detection algorithm ([yolov3](https://pjreddie.com/darknet/yolo/)) at its core to extract the features from an image. It uses an efficient cross-platform similarity search library [NMSLIB](https://github.com/nmslib/nmslib) for similarity search. [Redis](https://redis.io/) is used as a messaging queue between feature extractor and core engine. [MongoDB](https://www.mongodb.com/) is used to store the meta-data of all the indexed images. HD5 file system is used to store the feature vectors extracted from indexed images. 
 
 ## Installation

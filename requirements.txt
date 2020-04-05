@@ -1,0 +1,13 @@
+Cython
+requests
+numpy
+torch>=1.4.0
+matplotlib
+wget
+opencv_python
+boto3
+redis
+pandas
+torchvision
+pymongo
+google-cloud-storage
