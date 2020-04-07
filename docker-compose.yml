@@ -1,0 +1,85 @@
+---
+version: '3.7'
+services:
+
+  mongodb:
+    image: webhippie/mongodb:latest
+    container_name: ${NAMESPACE}-mongodb
+    restart: always
+    ports:
+    - 27017:27017
+    - 28017:28017
+    - 27019:27019
+    volumes:
+    - mongo-data:/var/lib/mongodb/db
+    - mongo-backup:/var/lib/backup
+    networks:
+    - internal
+    environment:
+    - MONGODB_AUTH=${MONGODB_AUTH}
+    - MONGODB_AUTH_DB=${MONGODB_AUTH_DB}
+    - MONGODB_DATABASE=${MONGODB_DATABASE}
+    - MONGODB_DBPATH=${MONGODB_DBPATH}
+    - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+    - MONGODB_REST=${MONGODB_REST}
+    - MONGODB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
+    - MONGODB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME}
+    - MONGODB_USERNAME=${MONGODB_USERNAME}
+    - MONGODB_VERBOSE=${MONGODB_VERBOSE}
+
+  mongoexpress:
+    restart: always
+    image: mongo-express
+    container_name: ${NAMESPACE}-mongoexpress
+    links:
+    - mongodb:mongo
+    environment:
+    - VCAP_APP_PORT=8090
+    - ME_CONFIG_MONGODB_AUTH_USERNAME=""
+    - ME_CONFIG_MONGODB_AUTH_PASSWORD=""
+    depends_on:
+    - mongodb
+    ports:
+    - 8090:8090
+    networks:
+    - internal
+    - web
+
+  redis:
+    image: redis:5-alpine
+    container_name: ${NAMESPACE}_redis 
+    restart: unless-stopped
+    ports:
+    - "6379:6379"
+    networks:
+    - internal
+
+  imaginary:
+    image: h2non/imaginary:latest
+    container_name: ${NAMESPACE}_imaginary
+    volumes:
+    - imaginary-data:/mnt/data
+    environment:
+       PORT: 9002
+    ports:
+    - "9002:9002"
+    command: -cors -gzip -enable-url-source -mount /mnt/data
+    networks:
+    - internal
+    - web
+    restart: unless-stopped
+
+networks:
+  internal:
+  web:
+    external: true
+
+volumes:
+  mongo-data:
+  mongo-backup:
+  imaginary-data:
+  app_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/shared/imsearch
