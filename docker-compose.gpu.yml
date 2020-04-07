@@ -2,6 +2,15 @@
 version: '3.7'
 services:
 
+  imsearch:
+    image: imsearch-gpu:latest
+    container_name: ${NAMESPACE}-gpu
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    ports:
+    - 5000:5000
+
   mongodb:
     image: webhippie/mongodb:latest
     container_name: ${NAMESPACE}-mongodb
