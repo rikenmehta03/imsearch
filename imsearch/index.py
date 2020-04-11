@@ -5,15 +5,22 @@ The module contains the Index class
 """
 
 import os
+import shutil
 import numpy as np
 import copy
+import tarfile
 import requests
+import pickle
+import uuid
+import tempfile
 
-from .nmslib import NMSLIBIndex
+from .nmslib import NMSLIBIndex, get_index_path
 from .extractor import FeatureExtractor
 from .repository import get_repository
 
 from .backend import run
+
+EPSILON = 10e-5
 
 
 class Index:
@@ -51,11 +58,11 @@ class Index:
         if Index.object_counter == 0 and Index.fe is not None:
             Index.fe.terminate()
 
-    def _get_object_wise_similar(self, features):
+    def _get_object_wise_similar(self, features, k):
         matches = {}
         for data in features['primary']:
             knn = self._nmslib_index.knnQuery(
-                data['features'], 'primary', k=10)
+                data['features'], 'primary', k=k)
             for x in knn:
                 img_data = self._repository_db.find({
                     'primary': {
@@ -76,7 +83,7 @@ class Index:
                         }
 
         knn = self._nmslib_index.knnQuery(
-            features['secondary'], 'secondary', k=10)
+            features['secondary'], 'secondary', k=k)
         for x in knn:
             img_data = self._repository_db.find({'secondary_index': x[0]})
             if img_data is not None:
@@ -94,12 +101,74 @@ class Index:
 
         def update_scores(data):
             score = (1 - self.match_ratio)*data.get('p_dist', 0) / \
-                (total_objects + 10e-5) + self.match_ratio*data.get('s_dist', 0)
+                (total_objects + EPSILON) + \
+                self.match_ratio*data.get('s_dist', 0)
             return (data['data'], score)
 
         matches = list(map(update_scores, matches))
         matches.sort(key=lambda x: x[1])
         return matches
+
+    @classmethod
+    def loadFromFile(cls, path='imsearch_index.tar.gz', name=None):
+        dir_path = os.path.join('/tmp', str(uuid.uuid4()))
+        os.makedirs(dir_path, exist_ok=True)
+        with tarfile.open(path, 'r:gz') as tf:
+            tf.extractall(dir_path)
+
+        with open(os.path.join(dir_path, 'info.pkl'), 'rb') as fp:
+            info = pickle.load(fp)
+
+        if name is not None:
+            info['name'] = name
+
+        with open(os.path.join(dir_path, 'data.pkl'), 'rb') as fp:
+            data = pickle.load(fp)
+
+        index_path = get_index_path(info['name'])
+        os.makedirs(os.path.dirname(index_path), exist_ok=True)
+        shutil.copyfile(os.path.join(
+            dir_path, 'index', 'index.h5'), index_path)
+
+        images_path = FeatureExtractor._get_image_path(info['name'])
+        os.makedirs(images_path, exist_ok=True)
+        updated_data = []
+        for entity in data:
+            image = entity['image']
+            if 'http' not in image:
+                image_name = os.path.basename(image)
+                dst = os.path.join(images_path, image_name)
+                src = os.path.join(dir_path, 'images', image_name)
+                shutil.copyfile(src, dst)
+                entity['image'] = dst
+                updated_data.append(copy.deepcopy(entity))
+
+        get_repository(info['name'], 'mongo').insert(updated_data)
+
+        return cls(info['name'])
+
+    def saveIndex(self, path='imsearch_index.tar.gz'):
+        data = self._repository_db.dump()
+        info = {
+            'name': self.name,
+            'count': len(data)
+        }
+        with tarfile.open(path, 'w:gz') as tf:
+            tf.add(get_index_path(self.name),
+                   arcname='index/index.h5', recursive=False)
+
+            pkl_path = os.path.join('/tmp', "{}.pkl".format(str(uuid.uuid4())))
+            with open(pkl_path, 'wb') as temp:
+                pickle.dump(data, temp)
+            tf.add(pkl_path, arcname='data.pkl', recursive=False)
+
+            with open(pkl_path, 'wb') as temp:
+                pickle.dump(info, temp)
+            tf.add(pkl_path, arcname='info.pkl', recursive=False)
+            os.remove(pkl_path)
+
+            tf.add(self._feature_extractor._get_image_path(
+                self.name), arcname='images/')
 
     def cleanIndex(self):
         """
@@ -109,7 +178,7 @@ class Index:
         self._nmslib_index.clean()
         self._repository_db.clean()
 
-    def addImage(self, image_path):
+    def addImage(self, image_path, save=True):
         """
         Add a single image to the index. 
         Parameters
@@ -117,14 +186,14 @@ class Index:
         image_path
             The local path or url to the image to add to the index.
         """
-        features = self._feature_extractor.extract(image_path)
+        features = self._feature_extractor.extract(image_path, save=save)
         if features is None:
             return False
         reposiory_data = self._nmslib_index.addDataPoint(features)
         self._repository_db.insert(reposiory_data)
         return True
 
-    def addImageBatch(self, image_list):
+    def addImageBatch(self, image_list, save=True):
         """
         Add a multiple image to the index. 
         Parameters
@@ -134,7 +203,7 @@ class Index:
         """
         response = []
         for image_path in image_list:
-            response.append(self.addImage(image_path))
+            response.append(self.addImage(image_path, save=save))
         return response
 
     def createIndex(self):
@@ -161,12 +230,12 @@ class Index:
         features = self._feature_extractor.extract(image_path, save=False)
         matches = []
         if policy == 'object':
-            matches = self._get_object_wise_similar(features)
+            matches = self._get_object_wise_similar(features, k)
 
         if not matches:
             knn = self._nmslib_index.knnQuery(
-                features['secondary'], 'secondary', k=10)
+                features['secondary'], 'secondary', k=k)
             matches = [(self._repository_db.find(
-                {'secondary_index': x[0]}, many=False), 1.0/x[1]) for x in knn]
+                {'secondary_index': x[0]}, many=False), 1.0/(x[1] + EPSILON)) for x in knn]
 
         return matches[:k]

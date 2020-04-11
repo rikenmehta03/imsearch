@@ -42,7 +42,7 @@ class TestIndex(unittest.TestCase):
         self.mock_nmslib_instance.addDataPoint.return_value = mock_data
 
         self.assertEqual(self.test_index.addImage(IMG_PATH), True)
-        self.mock_extractor_instance.extract.assert_called_with(IMG_PATH)
+        self.mock_extractor_instance.extract.assert_called_with(IMG_PATH, save=True)
         self.mock_nmslib_instance.addDataPoint.assert_called_with(mock_data)
         self.mock_repository_instance.insert.assert_called_with(mock_data)
 
@@ -52,7 +52,7 @@ class TestIndex(unittest.TestCase):
         self.mock_extractor_instance.extract.return_value = None
 
         self.assertEqual(self.test_index.addImage(IMG_PATH), False)
-        self.mock_extractor_instance.extract.assert_called_with(IMG_PATH)
+        self.mock_extractor_instance.extract.assert_called_with(IMG_PATH, save=True)
         self.mock_nmslib_instance.addDataPoint.assert_not_called()
         self.mock_repository_instance.insert.assert_not_called()
 
