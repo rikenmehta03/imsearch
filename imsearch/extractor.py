@@ -17,14 +17,15 @@ class FeatureExtractor:
         self.index_name = index_name
         self.redis_url = os.environ.get('REDIS_URI')
         self._redis_db = redis.StrictRedis.from_url(self.redis_url)
-        os.makedirs(self._get_image_path(), exist_ok=True)
+        os.makedirs(self._get_image_path(self.index_name), exist_ok=True)
 
-    def _get_image_path(self):
+    @classmethod
+    def _get_image_path(self, index_name):
         home_dir = os.environ.get('HOME')
-        return os.path.join(home_dir, '.imsearch', 'images', self.index_name)
+        return os.path.join(home_dir, '.imsearch', 'images', index_name)
 
     def _save_image(self, image, _id):
-        dst = os.path.join(self._get_image_path(), '{}.jpg'.format(_id))
+        dst = os.path.join(self._get_image_path(self.index_name), '{}.jpg'.format(_id))
         utils.save_image(image, dst)
         return dst
 
@@ -42,8 +43,8 @@ class FeatureExtractor:
         return data
 
     def clean(self):
-        shutil.rmtree(self._get_image_path())
-        os.makedirs(self._get_image_path(), exist_ok=True)
+        shutil.rmtree(self._get_image_path(self.index_name))
+        os.makedirs(self._get_image_path(self.index_name), exist_ok=True)
 
     def extract(self, image_path, save=True):
         image = utils.check_load_image(image_path)
