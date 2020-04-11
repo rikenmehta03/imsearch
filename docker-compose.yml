@@ -19,6 +19,9 @@ services:
     links:
     - mongodb:mongodb
     - redis:redis
+    networks:
+    - internal
+    - web
 
   mongodb:
     image: webhippie/mongodb:latest
