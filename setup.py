@@ -13,7 +13,7 @@ setuptools.setup(
     author='Riken Mehta',
     author_email='riken.mehta03@gmail.com',
     packages=setuptools.find_packages(),
-    install_requires=['torch', 'torchvision', 'pandas', 'tables', 'redis', 'pymongo', 'nmslib', 'wget', 'opencv-python', 'requests'],
+    install_requires=['Cython', 'torch', 'torchvision', 'pandas', 'tables', 'redis', 'pymongo', 'nmslib', 'wget', 'opencv-python', 'requests', 'google-cloud-storage', 'boto3'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",

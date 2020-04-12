@@ -5,11 +5,13 @@ import base64
 import uuid
 import json
 import time
+from tempfile import NamedTemporaryFile
 from PIL import Image
 import numpy as np
 import redis
 
 from . import utils
+from .storage import get_storage_object
 
 
 class FeatureExtractor:
@@ -17,6 +19,10 @@ class FeatureExtractor:
         self.index_name = index_name
         self.redis_url = os.environ.get('REDIS_URI')
         self._redis_db = redis.StrictRedis.from_url(self.redis_url)
+        if os.environ.get('STORAGE_MODE') not in ['local', 'none']:
+            self._storage = get_storage_object(os.environ.get('STORAGE_MODE'))
+        else:
+            self._storage = os.environ.get('STORAGE_MODE')
         os.makedirs(self._get_image_path(self.index_name), exist_ok=True)
 
     @classmethod
@@ -25,9 +31,19 @@ class FeatureExtractor:
         return os.path.join(home_dir, '.imsearch', 'images', index_name)
 
     def _save_image(self, image, _id):
-        dst = os.path.join(self._get_image_path(self.index_name), '{}.jpg'.format(_id))
-        utils.save_image(image, dst)
-        return dst
+        if self._storage == 'none':
+            return ''
+        elif self._storage == 'local':
+            dst = os.path.join(self._get_image_path(
+                self.index_name), '{}.jpg'.format(_id))
+            utils.save_image(image, dst)
+            return dst
+        else:
+            with NamedTemporaryFile() as temp:
+                dst = "{}.jpg".format(temp.name)
+                key = "images/{}/{}.jpg".format(self.index_name, _id)
+                utils.save_image(image, dst)
+                return self._storage.upload(dst, key)
 
     def _decode_redis_data(self, data):
         data = json.loads(data.decode('utf-8'))
