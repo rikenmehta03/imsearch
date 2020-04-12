@@ -4,7 +4,8 @@ import copy
 default_config = {
     'MONGO_URI': 'mongodb://localhost:27017/',
     'REDIS_URI': 'redis://localhost:6379/0',
-    'DETECTOR_MODE': 'local'
+    'DETECTOR_MODE': 'local',
+    'STORAGE_MODE': 'local'
 }
 
 
