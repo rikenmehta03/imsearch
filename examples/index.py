@@ -61,7 +61,7 @@ def show_results(similar, qImage):
 if __name__ == "__main__":
     all_images = glob.glob(os.path.join(
         os.path.dirname(__file__), '..', 'images/*.jpg'))
-    index = create_index('test', all_images[:25])
+    index = create_index('test', all_images)
 
     # query index with image path
     '''
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     k: Number of results
     policy: choose policy from 'object' or 'global'. Search results will change accordingly.
     '''
-    similar = index.knnQuery(image_path=all_images[25], k=10, policy='object')
+    similar = index.knnQuery(image_path=all_images[-1], k=10, policy='object')
     show_results(similar, all_images[25])
 
     # query with image URL

@@ -36,7 +36,7 @@ def show_output(output, img):
 
 
 if __name__ == "__main__":
-    PATH = '../images/000000000139.jpg'
+    PATH = '../images/000000055167.jpg' 
     detector = Detector()
 
     img = utils.check_load_image(PATH)
