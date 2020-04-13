@@ -135,15 +135,17 @@ class Index:
         updated_data = []
         for entity in data:
             image = entity['image']
-            if 'http' not in image:
+            if image != '' and 'http' not in image:
                 image_name = os.path.basename(image)
                 dst = os.path.join(images_path, image_name)
                 src = os.path.join(dir_path, 'images', image_name)
                 shutil.copyfile(src, dst)
                 entity['image'] = dst
-                updated_data.append(copy.deepcopy(entity))
+            updated_data.append(copy.deepcopy(entity))
 
-        get_repository(info['name'], 'mongo').insert(updated_data)
+        db = get_repository(info['name'], 'mongo')
+        db.clean()
+        db.insert(updated_data)
 
         return cls(info['name'])
 
