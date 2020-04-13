@@ -41,7 +41,7 @@ if __name__ == "__main__":
         os.path.dirname(__file__), '..', 'images/*.jpg'))
     index = imsearch.init(name='test', **aws_config)
     index.cleanIndex()
-    index.addImageBatch(all_images[0:25])
+    index.addImageBatch(all_images)
     index.createIndex()
 
     # query with image URL

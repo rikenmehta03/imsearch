@@ -9,7 +9,7 @@ import imsearch
 def create_and_save(name, images, file_path):
     index = imsearch.init(name)
     index.cleanIndex()
-    index.addImageBatch(images[0:25])
+    index.addImageBatch(images)
     index.createIndex()
     index.saveIndex(file_path)
     index.cleanIndex()
