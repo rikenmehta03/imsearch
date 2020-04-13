@@ -230,6 +230,8 @@ class Index:
         """
 
         features = self._feature_extractor.extract(image_path, save=False)
+        if features is None:
+            return []
         matches = []
         if policy == 'object':
             matches = self._get_object_wise_similar(features, k)
