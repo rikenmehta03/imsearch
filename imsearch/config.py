@@ -10,7 +10,10 @@ default_config = {
 
 
 def config_init(config):
-    final_config = copy.deepcopy(default_config)
+    final_config = {}
+    for k, v in default_config.items():
+        final_config[k] = os.environ.get(k, v)
+
     for k, v in config.items():
         final_config[k] = v
     os.environ.update(final_config)
