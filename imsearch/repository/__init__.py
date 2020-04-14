@@ -30,3 +30,6 @@ class RepositoryWrapper:
             return self.db.find(query)
         else:
             return self.db.find_one(query)
+    
+    def dump(self):
+        return self.db.find({})

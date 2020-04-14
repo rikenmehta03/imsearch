@@ -13,6 +13,11 @@ def NMSLIBIndex(index_name):
     return instance_map[index_name]
 
 
+def get_index_path(index_name):
+    home_dir = os.environ.get('HOME')
+    return os.path.join(home_dir, '.imsearch', 'indices', index_name, 'index.h5')
+
+
 class _nmslibIndex:
     def __init__(self, name):
         self.index_name = name
@@ -23,12 +28,8 @@ class _nmslibIndex:
         c = index.addDataPointBatch(data, range(data.shape[0]))
         return index, c
 
-    def _get_index_path(self):
-        home_dir = os.environ.get('HOME')
-        return os.path.join(home_dir, '.imsearch', 'indices', self.index_name, 'index.h5')
-
     def _load_index(self):
-        index_file = self._get_index_path()
+        index_file = get_index_path(self.index_name)
 
         self.primary = nmslib.init(
             method='hnsw', space='l2', data_type=nmslib.DataType.DENSE_VECTOR)
@@ -61,7 +62,7 @@ class _nmslibIndex:
         return index, _t + 1
 
     def clean(self):
-        index_file = self._get_index_path()
+        index_file = get_index_path(self.index_name)
         if os.path.exists(os.path.dirname(index_file)):
             shutil.rmtree(os.path.dirname(index_file))
             self._load_index()
@@ -126,16 +127,18 @@ class _nmslibIndex:
         self.secondary.createIndex(index_time_params)
         self.bitmap.createIndex(index_time_params)
 
-        os.makedirs(os.path.dirname(self._get_index_path()), exist_ok=True)
-        
+        os.makedirs(os.path.dirname(
+            get_index_path(self.index_name)), exist_ok=True)
+
         if self.primary_df is not None:
-            self.primary_df.to_hdf(self._get_index_path(), 'primary')
-        
+            self.primary_df.to_hdf(get_index_path(self.index_name), 'primary')
+
         if self.secondary_df is not None:
-            self.secondary_df.to_hdf(self._get_index_path(), 'secondary')
-        
+            self.secondary_df.to_hdf(
+                get_index_path(self.index_name), 'secondary')
+
         if self.bitmap_df is not None:
-            self.bitmap_df.to_hdf(self._get_index_path(), 'bitmap')
+            self.bitmap_df.to_hdf(get_index_path(self.index_name), 'bitmap')
 
         efs = 100
         query_time_params = {'efSearch': efs}
