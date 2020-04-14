@@ -10,6 +10,19 @@ services:
       dockerfile: Dockerfile.gpu
     ports:
     - 5000:5000
+    environment:
+    - MONGO_URI=mongodb://mongodb:27017/
+    - REDIS_URI=redis://redis:6379/0
+    - STORAGE_MODE=local
+    depends_on:
+    - redis
+    - mongodb
+    links:
+    - mongodb:mongodb
+    - redis:redis
+    networks:
+    - internal
+    - web
 
   mongodb:
     image: webhippie/mongodb:latest
