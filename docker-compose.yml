@@ -11,8 +11,9 @@ services:
     ports:
     - 5000:5000
     environment:
-    - MONGO_URI='mongodb://mongodb:27017/',
-    - REDIS_URI='redis://redis:6379/0',
+    - MONGO_URI=mongodb://mongodb:27017/
+    - REDIS_URI=redis://redis:6379/0
+    - STORAGE_MODE=local
     depends_on:
     - redis
     - mongodb  
