@@ -4,7 +4,7 @@ services:
 
   imsearch:
     image: imsearch-gpu:latest
-    container_name: ${NAMESPACE}-gpu
+    container_name: imsearch-gpu
     build:
       context: .
       dockerfile: Dockerfile.gpu
@@ -26,6 +26,7 @@ services:
 
   mongodb:
     image: mongo:latest
+    container_name: imsearch-mongodb
     volumes:
     - mongo-data:/var/lib/mongodb/db
     - mongo-backup:/var/lib/backup
@@ -37,7 +38,7 @@ services:
 
   redis:
     image: redis:5-alpine
-    container_name: ${NAMESPACE}_redis 
+    container_name: imsearch-redis 
     restart: unless-stopped
     ports:
     - "6379:6379"
