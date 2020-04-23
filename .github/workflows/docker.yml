@@ -5,11 +5,6 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
-      - release
-
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
 
 env:
   IMAGE_NAME: lucmichalski/imsearch
@@ -48,21 +43,3 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-
-      - name: Deploy
-        run: |
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          if [ "$VERSION" == "release" ]; then
-            curl ${{ secrets.JENKINS_RELEASE_URL }}
-          fi
-          if [ "$VERSION" == "develop" ]; then
-            curl ${{ secrets.JENKINS_DEVELOP_URL }}
-          fi
-          if [ "$VERSION" == "master" ]; then
-            curl ${{ secrets.JENKINS_DEMO_URL }}
-          fi
