@@ -78,7 +78,7 @@ docker-compose run imsearch
 ### For GPU
 ```bash
 docker-compose -f docker-compose.gpu.yml build
-docker-compose run imsearch
+docker-compose -f docker-compose.gpu.yml run imsearch
 ```
 
 For detailed usage see [`examples/index.py`](examples/index.py)
