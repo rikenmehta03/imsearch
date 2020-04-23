@@ -12,7 +12,7 @@ on:
       - v*
 
 env:
-  IMAGE_NAME: lucmichalski/peaks-tires
+  IMAGE_NAME: lucmichalski/imsearch
 
 jobs:
   # Push image to GitHub Package Registry.
