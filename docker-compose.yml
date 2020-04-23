@@ -49,24 +49,6 @@ services:
     - MONGODB_USERNAME=${MONGODB_USERNAME}
     - MONGODB_VERBOSE=${MONGODB_VERBOSE}
 
-  mongoexpress:
-    restart: always
-    image: mongo-express
-    container_name: ${NAMESPACE}-mongoexpress
-    links:
-    - mongodb:mongo
-    environment:
-    - VCAP_APP_PORT=8090
-    - ME_CONFIG_MONGODB_AUTH_USERNAME=""
-    - ME_CONFIG_MONGODB_AUTH_PASSWORD=""
-    depends_on:
-    - mongodb
-    ports:
-    - 8090:8090
-    networks:
-    - internal
-    - web
-
   redis:
     image: redis:5-alpine
     container_name: ${NAMESPACE}_redis 
@@ -76,21 +58,6 @@ services:
     networks:
     - internal
 
-  imaginary:
-    image: h2non/imaginary:latest
-    container_name: ${NAMESPACE}_imaginary
-    volumes:
-    - imaginary-data:/mnt/data
-    environment:
-       PORT: 9002
-    ports:
-    - "9002:9002"
-    command: -cors -gzip -enable-url-source -mount /mnt/data
-    networks:
-    - internal
-    - web
-    restart: unless-stopped
-
 networks:
   internal:
   web:
@@ -99,7 +66,6 @@ networks:
 volumes:
   mongo-data:
   mongo-backup:
-  imaginary-data:
   app_data:
     driver_opts:
       type: none
