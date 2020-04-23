@@ -7,7 +7,7 @@ on:
       - master
 
 env:
-  IMAGE_NAME: lucmichalski/imsearch
+  IMAGE_NAME: rikenmehta03/imsearch
 
 jobs:
   # Push image to GitHub Package Registry.
