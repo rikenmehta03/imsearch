@@ -119,6 +119,15 @@ RUN pip install --no-binary :all: nmslib
 # ------------------------------------------------------------------
 WORKDIR /imsearch
 COPY . /imsearch
+
+# ==================================================================
+# test imsearch
+# ------------------------------------------------------------------
+RUN python3 -m pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install nose2 && \
+    nose2
+
 RUN pip install .
 
 CMD ["/bin/bash"]
