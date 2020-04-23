@@ -25,29 +25,15 @@ services:
     - web
 
   mongodb:
-    image: webhippie/mongodb:latest
-    container_name: ${NAMESPACE}-mongodb
-    restart: always
-    ports:
-    - 27017:27017
-    - 28017:28017
-    - 27019:27019
+    image: mongo:latest
     volumes:
     - mongo-data:/var/lib/mongodb/db
     - mongo-backup:/var/lib/backup
+    ports:
+    - 27017:27017
     networks:
     - internal
-    environment:
-    - MONGODB_AUTH=${MONGODB_AUTH}
-    - MONGODB_AUTH_DB=${MONGODB_AUTH_DB}
-    - MONGODB_DATABASE=${MONGODB_DATABASE}
-    - MONGODB_DBPATH=${MONGODB_DBPATH}
-    - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-    - MONGODB_REST=${MONGODB_REST}
-    - MONGODB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
-    - MONGODB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME}
-    - MONGODB_USERNAME=${MONGODB_USERNAME}
-    - MONGODB_VERBOSE=${MONGODB_VERBOSE}
+    command: mongod --replSet mongodb0 --smallfiles
 
   redis:
     image: redis:5-alpine
