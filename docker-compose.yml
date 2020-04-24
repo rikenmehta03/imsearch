@@ -26,7 +26,7 @@ services:
 
   mongodb:
     image: mongo:latest
-    containaer_name: imsearch-mongodb
+    container_name: imsearch-mongodb
     volumes:
     - mongo-data:/var/lib/mongodb/db
     - mongo-backup:/var/lib/backup
