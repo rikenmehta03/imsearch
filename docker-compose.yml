@@ -1,0 +1,60 @@
+---
+version: '3.7'
+services:
+
+  imsearch:
+    image: imsearch-cpu:latest
+    container_name: imsearch-cpu
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 5000:5000
+    environment:
+    - MONGO_URI=mongodb://mongodb:27017/
+    - REDIS_URI=redis://redis:6379/0
+    - STORAGE_MODE=local
+    depends_on:
+    - redis
+    - mongodb  
+    links:
+    - mongodb:mongodb
+    - redis:redis
+    networks:
+    - internal
+    - web
+
+  mongodb:
+    image: mongo:latest
+    container_name: imsearch-mongodb
+    volumes:
+    - mongo-data:/var/lib/mongodb/db
+    - mongo-backup:/var/lib/backup
+    ports:
+    - 27017:27017
+    networks:
+    - internal
+    command: mongod --replSet mongodb0 --smallfiles
+
+  redis:
+    image: redis:5-alpine
+    container_name: imsearch-redis 
+    restart: unless-stopped
+    ports:
+    - "6379:6379"
+    networks:
+    - internal
+
+networks:
+  internal:
+  web:
+    external: true
+
+volumes:
+  mongo-data:
+  mongo-backup:
+  app_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/shared/imsearch
