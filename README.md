@@ -72,14 +72,12 @@ linux: <a href="https://docs.docker.com/compose/install/"> https://docs.docker.c
 
 ### For CPU
 ```bash
-mv .env-example .env
 docker-compose build
 docker-compose run imsearch
 ```
 
 ### For GPU
 ```bash
-mv .env-example .env
 docker-compose -f docker-compose.gpu.yml build
 docker-compose -f docker-compose.gpu.yml run imsearch
 ```
