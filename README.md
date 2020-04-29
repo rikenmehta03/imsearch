@@ -47,10 +47,41 @@ index.createIndex()
 # find k nearest similar images
 # choose policy from 'object' or 'global'. Search results will change accordingly.
 # object: Object level matching. The engine will look for similarity at object level for every object detected in the image.
-# global: Overall similarity using single feature space on the whole image. 
+# global: Overall similarity using single feature space on the whole image.
 similar = index.knnQuery('path/to/query/image', k=10, policy='object')
 ```
 For detailed usage see [`examples/index.py`](examples/index.py)
+
+## Docker
+If you don't have Docker/Docker-Compose check **Setup Docker** section
+
+<details>
+<summary><b>Setup Docker</b></summary>
+<p>
+
+### Docker
+macOS: <a href="https://docs.docker.com/docker-for-mac/install/"> https://docs.docker.com/docker-for-mac/install/ </a>
+
+linux: <a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/"> https://docs.docker.com/install/linux/docker-ce/ubuntu/ </a>
+
+### Docker Compose
+
+linux: <a href="https://docs.docker.com/compose/install/"> https://docs.docker.com/compose/install/ </a>
+</p>
+</details>
+
+### For CPU
+```bash
+docker-compose build
+docker-compose run imsearch
+```
+
+### For GPU
+```bash
+docker-compose -f docker-compose.gpu.yml build
+docker-compose -f docker-compose.gpu.yml run imsearch
+```
+
 ## Credit
 
 ### YOLOv3: An Incremental Improvement

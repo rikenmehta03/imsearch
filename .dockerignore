@@ -1,0 +1,10 @@
+.git
+.git/**
+.github/
+.github/**
+.gitignore
+.dockerignore
+*.yml
+# *.md
+Dockerfile
+Dockerfile.gpu
