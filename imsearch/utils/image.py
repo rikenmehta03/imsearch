@@ -8,18 +8,27 @@ from io import BytesIO
 import numpy as np
 
 
+def _get_data_from_path(image_path):
+    if image_path.startswith('data:image/'):
+        image_path = image_path.split(',')[1]
+        data = BytesIO(base64.urlsafe_b64decode(image_path))
+    elif image_path.startswith('http'):
+        r = requests.get(image_path)
+        if r.status_code != 200:
+            return None
+        data = BytesIO(r.content)
+    else:
+        data = image_path
+
+    return data
+
+
 def check_load_image(image_path):
     if isinstance(image_path, str):
-        if 'http' in image_path:
-            r = requests.get(image_path)
-            if r.status_code != 200:
-                return None
-            img = np.asarray(Image.open(BytesIO(r.content)))
-        elif image_path.startswith('data:image/'):
-            image_path = image_path.split(',')[1]
-            data = base64.urlsafe_b64decode(image_path)
-            img = np.asarray(Image.open(BytesIO(data)))
-        else:
+        data = _get_data_from_path(image_path)
+        try:
+            img = np.asarray(Image.open(data))
+        except:
             return None
     else:
         try:
@@ -32,7 +41,7 @@ def check_load_image(image_path):
 
     if img.shape[2] > 3:
         img = img[:, :, :3]
-    
+
     return img
 
 
