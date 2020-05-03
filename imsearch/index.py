@@ -109,6 +109,16 @@ class Index:
         matches.sort(key=lambda x: x[1])
         return matches
 
+    def _get_metadata(self, features):
+        metadata = {'primary': []}
+        for obj in features['primary']:
+            metadata['primary'].append({
+                'name': obj['name'],
+                'box': obj['box']
+            })
+        
+        return metadata
+
     @classmethod
     def loadFromFile(cls, path='imsearch_index.tar.gz', name=None):
         dir_path = os.path.join('/tmp', str(uuid.uuid4()))
@@ -242,4 +252,4 @@ class Index:
             matches = [(self._repository_db.find(
                 {'secondary_index': x[0]}, many=False), 1.0/(x[1] + EPSILON)) for x in knn]
 
-        return matches[:k]
+        return matches[:k], self._get_metadata(features)

@@ -46,5 +46,5 @@ if __name__ == "__main__":
 
     # query with image URL
     img_url = 'https://www.wallpaperup.com/uploads/wallpapers/2014/04/14/332423/d5c09641cb3af3a18087937d55125ae3-700.jpg'
-    similar = index.knnQuery(image_path=img_url, k=10, policy='global')
+    similar, _ = index.knnQuery(image_path=img_url, k=10, policy='global')
     show_results(similar, img_url)
